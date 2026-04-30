@@ -419,27 +419,7 @@
       height: 100%;
     }
 
-    .hover-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(18, 18, 18, .8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: .4rem;
-      font-size: .8rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--cream);
-      font-weight: bold;
-      font-style: italic;
-      opacity: 0;
-      transition: opacity .22s;
-    }
 
-    .cap-card:hover .hover-overlay {
-      opacity: 1;
-    }
 
     .cap-info {
       padding: 1.2rem;
@@ -1037,16 +1017,7 @@
     <p>Built with Gaussian Splatting + Luma AI</p>
   </footer>
 
-  <!-- MODAL -->
-  <div class="modal-bg" id="modalBg" onclick="closeModal(event)">
-    <div class="modal">
-      <button class="modal-close" onclick="closeModalDirect()">✕</button>
-      <h3 id="modalTitle">–</h3>
-      <p class="modal-sub" id="modalSub">–</p>
-      <div class="modal-viewer" id="modalViewer"></div>
-      <div class="modal-meta" id="modalMeta"></div>
-    </div>
-  </div>
+
 
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
@@ -1149,7 +1120,7 @@
       count.textContent = `${caps.length} pièce${caps.length > 1 ? 's' : ''} · Saison 01`;
 
       grid.innerHTML = caps.map((cap, i) => `
-    <div class="cap-card" onclick="openModal(${i})">
+    <div class="cap-card">
       <div class="cap-viewer" id="cardViewer${cap.id}">
         ${cap.splatUrl
           ? `<div id="splat-preview-${cap.id}" style="width:100%;height:100%;background:var(--surface);"></div>`
@@ -1159,7 +1130,6 @@
                  <canvas id="cap2d-${cap.id}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
                </div>`
         }
-        <div class="hover-overlay">↗ Voir en Plein Écran</div>
       </div>
       <div class="cap-info">
         <div class="cap-name">${cap.name}</div>
@@ -1364,53 +1334,7 @@
 
 
 
-    // ── MODAL ──
-    function openModal(index) {
-      const cap = caps[index];
-      if (!cap) return;
-      document.getElementById('modalTitle').textContent = cap.name;
-      document.getElementById('modalSub').textContent = cap.tag + ' · ' + statusLabel(cap.status);
 
-      const viewer = document.getElementById('modalViewer');
-      if (cap.splatUrl) {
-        viewer.innerHTML = `<div id="modal-splat-container" style="width:100%;height:100%;position:relative;"></div>`;
-        setTimeout(() => initSplatViewer('modal-splat-container', cap), 100);
-      } else {
-        viewer.innerHTML = `
-      <div class="modal-placeholder">
-        <canvas id="modal-2d" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-      </div>`;
-        setTimeout(() => {
-          const c = document.getElementById('modal-2d');
-          if (c) { c.width = c.offsetWidth; c.height = c.offsetHeight; animateCap2D(c.getContext('2d'), c.width, c.height, cap.color, 0, 'modal'); }
-        }, 80);
-      }
-
-      document.getElementById('modalMeta').innerHTML = `
-    <div class="modal-meta-item">
-      <span class="modal-meta-label">Statut</span>
-      <span class="modal-meta-val">${statusLabel(cap.status)}</span>
-    </div>
-    <div class="modal-meta-item">
-      <span class="modal-meta-label">Technique</span>
-      <span class="modal-meta-val">${cap.tag}</span>
-    </div>
-    <div class="modal-meta-item">
-      <span class="modal-meta-label">Scan 3D</span>
-      <span class="modal-meta-val">${cap.splatUrl ? '✓ Disponible' : '— En attente'}</span>
-    </div>
-  `;
-
-      document.getElementById('modalBg').classList.add('open');
-    }
-
-    function closeModal(e) {
-      if (e.target === document.getElementById('modalBg')) closeModalDirect();
-    }
-    function closeModalDirect() {
-      document.getElementById('modalBg').classList.remove('open');
-      if (animFrames['modal']) cancelAnimationFrame(animFrames['modal']);
-    }
 
     // ── TOAST ──
     function showToast(msg) {
