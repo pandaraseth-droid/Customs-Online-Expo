@@ -1055,7 +1055,7 @@
         name: s.name,
         tag: s.tag,
         status: s.status,
-        splatUrl: '/splats/' + s.file,
+        splatUrl: 'splats/' + s.file,
         color: s.color,
         thumb: s.thumb,
         pivot: s.pivot || [0, 0, 0],
@@ -1077,8 +1077,14 @@
     function loadCaps() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return getDefaultCaps();
-        return JSON.parse(raw);
+        let data = !raw ? getDefaultCaps() : JSON.parse(raw);
+        // Nettoyage automatique des chemins pour GitHub Pages
+        data.forEach(c => {
+          if (c.splatUrl && c.splatUrl.startsWith('/splats/')) {
+            c.splatUrl = c.splatUrl.substring(1);
+          }
+        });
+        return data;
       } catch { return getDefaultCaps(); }
     }
 
