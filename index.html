@@ -927,7 +927,6 @@
     <div class="logo">CAP<span>S</span></div>
     <ul>
       <li><a href="#collection">Collection</a></li>
-      <li><a href="#upload">Ajouter un splat</a></li>
     </ul>
     <span class="poc-tag">POC v0.1</span>
   </nav>
@@ -943,8 +942,6 @@
         <button class="btn btn-dark"
           onclick="document.getElementById('collection').scrollIntoView({behavior:'smooth'})">Voir la
           collection</button>
-        <button class="btn btn-ghost" onclick="document.getElementById('upload').scrollIntoView({behavior:'smooth'})">↓
-          Ajouter un splat</button>
       </div>
     </div>
     <div class="hero-viewer">
@@ -987,54 +984,7 @@
     </div>
   </section>
 
-  <!-- UPLOAD -->
-  <section class="upload-section" id="upload">
-    <h2>Ajouter un <span>Splat</span></h2>
-    <p>Upload ton fichier .splat ou .ply généré depuis Luma AI, Polycam ou Scaniverse. Il apparaîtra directement dans la
-      collection.</p>
 
-    <div class="upload-grid">
-
-      <div>
-        <label class="upload-zone" id="dropZone" for="fileInput">
-          <input type="file" id="fileInput" accept=".splat,.ply,.spz" />
-          <div class="upload-icon">↑</div>
-          <div class="upload-title" id="dropLabel">Glisse ton fichier ici</div>
-          <div class="upload-sub">ou clique pour parcourir</div>
-          <div class="upload-formats">
-            <span class="fmt-chip">.splat</span>
-            <span class="fmt-chip">.ply</span>
-            <span class="fmt-chip">.spz</span>
-          </div>
-        </label>
-        <div class="progress-wrap" id="progressWrap">
-          <div class="progress-bar" id="progressBar"></div>
-        </div>
-        <div class="upload-status" id="uploadStatus"></div>
-      </div>
-
-      <div class="upload-form">
-        <div class="form-field">
-          <label>Nom de la casquette</label>
-          <input type="text" id="capName" placeholder="ex: Soleil Levant" />
-        </div>
-        <div class="form-field">
-          <label>Technique</label>
-          <input type="text" id="capTag" placeholder="ex: broderie fil or · patch" />
-        </div>
-        <div class="form-field">
-          <label>Statut</label>
-          <select id="capStatus">
-            <option value="unique">Pièce unique</option>
-            <option value="soon">Bientôt disponible</option>
-            <option value="live">En ligne</option>
-          </select>
-        </div>
-        <button class="btn-gold" id="addBtn" disabled onclick="addCap()">Ajouter à la collection</button>
-      </div>
-
-    </div>
-  </section>
 
   <!-- FOOTER -->
   <footer>
@@ -1073,9 +1023,30 @@
     // Pour ajouter une casquette : duplique une ligne, incrémente le numéro
     // et mets le fichier correspondant dans /splats/
     const SPLAT_FILES = [
-      { file: 'gaussiansplatcustom1.ply', name: 'Custom 01', tag: 'gaussian splat', status: 'unique', color: '#e63946' },
-      { file: 'gaussiansplatcustom2.ply', name: 'Custom 02', tag: 'gaussian splat', status: 'unique', color: '#2b4162' },
-      // { file: 'gaussiansplatcustom3.spz', name: 'Custom 03', tag: 'gaussian splat', status: 'unique', color: '#121212' },
+      {
+        file: 'gaussiansplatcustom1.ply',
+        name: 'Custom 01',
+        tag: 'gaussian splat',
+        status: 'unique',
+        color: '#e63946',
+        thumb: 'https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=600&q=80',
+        pivot: [0, 0, 0],
+        offset: [-0.1, 0.25, 0],
+        rotation: [30, 90, 0],
+        zoom: 2.0
+      },
+      {
+        file: 'gaussiansplatcustom2.ply',
+        name: 'Custom 02',
+        tag: 'gaussian splat',
+        status: 'unique',
+        color: '#2b4162',
+        thumb: 'https://images.unsplash.com/photo-1556306535-0f09a536f01f?w=600&q=80',
+        pivot: [0, 0, 0],
+        offset: [0, .35, 0],
+        rotation: [30, 90, 0],
+        zoom: 2.0
+      },
     ];
 
     function getDefaultCaps() {
@@ -1086,6 +1057,11 @@
         status: s.status,
         splatUrl: '/splats/' + s.file,
         color: s.color,
+        thumb: s.thumb,
+        pivot: s.pivot || [0, 0, 0],
+        offset: s.offset || [0, 0, 0],
+        rotation: s.rotation || [0, 0, 0],
+        zoom: s.zoom || 2,
         added: Date.now(),
       }));
     }
@@ -1125,12 +1101,14 @@
     <div class="cap-card" onclick="openModal(${i})">
       <div class="cap-viewer" id="cardViewer${cap.id}">
         ${cap.splatUrl
-          ? `<div id="splat-container-${cap.id}" style="width:100%;height:100%;background:#121212;"></div>`
-          : `<div class="mini-placeholder">
-               <canvas id="cap2d-${cap.id}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
-             </div>`
+          ? `<div id="splat-preview-${cap.id}" style="width:100%;height:100%;background:var(--surface);"></div>`
+          : cap.thumb
+            ? `<img src="${cap.thumb}" alt="${cap.name}" style="width:100%;height:100%;object-fit:cover;display:block;" />`
+            : `<div class="mini-placeholder">
+                 <canvas id="cap2d-${cap.id}" style="position:absolute;inset:0;width:100%;height:100%"></canvas>
+               </div>`
         }
-        <div class="hover-overlay">↗ Voir en 3D</div>
+        <div class="hover-overlay">↗ Voir en Plein Écran</div>
       </div>
       <div class="cap-info">
         <div class="cap-name">${cap.name}</div>
@@ -1143,7 +1121,10 @@
   `).join('');
 
       caps.forEach((cap, i) => {
-        if (!cap.splatUrl) {
+        if (cap.splatUrl) {
+          // Initialise le viewer directement dans la miniature
+          initSplatViewer(`splat-preview-${cap.id}`, cap);
+        } else if (!cap.thumb) {
           draw2DCap(cap.id, cap.color || '#c9a84c', i);
         }
       });
@@ -1232,16 +1213,17 @@
       label.textContent = `CAP N°001 — "${first.name.toUpperCase()}"`;
       if (first.splatUrl) {
         hero.innerHTML = `<div id="hero-splat-container" style="width:100%;height:100%;position:relative;"></div>`;
-        initSplatViewer('hero-splat-container', first.splatUrl);
+        initSplatViewer('hero-splat-container', first);
       }
     }
 
     // ── SPLAT VIEWER INIT ──
-    function initSplatViewer(containerId, url) {
+    function initSplatViewer(containerId, cap) {
+      const url = cap.splatUrl;
       // Uses gaussian-splats-3d if available, else shows placeholder
       if (!window.GaussianSplats3D) {
         console.log('GS3D lib not yet loaded, retrying...');
-        setTimeout(() => initSplatViewer(containerId, url), 500);
+        setTimeout(() => initSplatViewer(containerId, cap), 500);
         return;
       }
       const container = document.getElementById(containerId);
@@ -1253,20 +1235,12 @@
       container.addEventListener('dblclick', stopEvent, true);
       container.addEventListener('click', stopEvent, true);
 
-      // 🎯 CHOIX DU POINT DE PIVOT (X, Y, Z)
-      const pointDePivot = [0, 0, 0];
-
-      // 🔍 ZOOM DE DÉPART (X, Y, Z)
-      // Rapproche ou éloigne la caméra par défaut. 
-      // Si c'est trop loin, diminue le Z (le 3ème chiffre), par exemple : 2 ou 1.5
-      const positionCameraDepart = [0, 0, 2];
-
-      // ⬆️⬇️ CORRECTION DE LA POSITION (X, Y, Z)
-      // Si la casquette est trop haute dans le cadre, descend-la en modifiant le Y ou Z
-      const positionOffset = [-0.1, 0.25, 0];
-
-      // 🔄 CORRECTION DE L'INCLINAISON (en degrés)
-      const rotationDegres = [30, 90, 0];
+      // 🎯 RÉGLAGES INDIVIDUELS DEPUIS L'OBJET CAP
+      const pointDePivot = cap.pivot || [0, 0, 0];
+      const positionOffset = cap.offset || [0, 0, 0];
+      const rotationDegres = cap.rotation || [0, 0, 0];
+      const zoom = cap.zoom || 2;
+      const positionCameraDepart = [0, 0, zoom];
 
       // Fonction mathématique pour convertir tes degrés en Quaternion pour la librairie
       function eulerToQuaternion(degX, degY, degZ) {
@@ -1322,10 +1296,13 @@
           // 1. Bloquer le déplacement latéral (Pan)
           controls.enablePan = false;
 
-          // 2. BLOQUER LA ROTATION VERTICALE
-          const angleVerticalFixe = Math.PI / 2.2;
-          controls.maxPolarAngle = angleVerticalFixe;
-          controls.minPolarAngle = angleVerticalFixe;
+          // 2. LIMITER LA ROTATION VERTICALE (Haut / Bas)
+          // angleCentral = la position idéale de repos (Math.PI / 2.2)
+          // marge = la liberté de mouvement (0.2 permet de regarder un tout petit peu au-dessus/en-dessous)
+          const angleCentral = Math.PI / 2.2;
+          const marge = 0.2;
+          controls.maxPolarAngle = angleCentral + marge;
+          controls.minPolarAngle = angleCentral - marge;
 
           // 3. Limiter le zoom in / zoom out
           controls.minDistance = 1.0;
@@ -1334,97 +1311,7 @@
       });
     }
 
-    // ── FILE UPLOAD ──
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const addBtn = document.getElementById('addBtn');
 
-    fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
-
-    dropZone.addEventListener('dragover', e => {
-      e.preventDefault();
-      dropZone.classList.add('drag-over');
-    });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-    dropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropZone.classList.remove('drag-over');
-      handleFile(e.dataTransfer.files[0]);
-    });
-
-    function handleFile(file) {
-      if (!file) return;
-      const ext = file.name.split('.').pop().toLowerCase();
-      if (!['splat', 'ply', 'spz'].includes(ext)) {
-        showToast('Format non supporté. Utilise .splat, .ply ou .spz');
-        return;
-      }
-      selectedFile = file;
-      document.getElementById('dropLabel').textContent = file.name;
-      document.getElementById('uploadStatus').textContent = `✓ Fichier prêt · ${(file.size / 1024 / 1024).toFixed(1)} MB`;
-      addBtn.disabled = false;
-
-      // auto-fill name from filename
-      const nameInput = document.getElementById('capName');
-      if (!nameInput.value) {
-        nameInput.value = file.name.replace(/\.(splat|ply|spz)$/i, '').replace(/[-_]/g, ' ');
-      }
-    }
-
-    // ── ADD CAP ──
-    function addCap() {
-      const name = document.getElementById('capName').value.trim() || 'Sans nom';
-      const tag = document.getElementById('capTag').value.trim() || 'custom';
-      const status = document.getElementById('capStatus').value;
-
-      const progressWrap = document.getElementById('progressWrap');
-      const progressBar = document.getElementById('progressBar');
-      const statusEl = document.getElementById('uploadStatus');
-      const btn = document.getElementById('addBtn');
-
-      btn.disabled = true;
-      progressWrap.style.display = 'block';
-
-      // Simulate progress (real file stays local as blob URL)
-      let p = 0;
-      const interval = setInterval(() => {
-        p += Math.random() * 18;
-        if (p > 95) p = 95;
-        progressBar.style.width = p + '%';
-        statusEl.textContent = `Traitement… ${Math.round(p)}%`;
-      }, 120);
-
-      setTimeout(() => {
-        clearInterval(interval);
-        progressBar.style.width = '100%';
-
-        const splatUrl = selectedFile ? URL.createObjectURL(selectedFile) : null;
-        const colors = ['#e63946', '#2b4162', '#121212', '#f0ece1', '#a22530', '#1d2b42'];
-        const cap = {
-          id: 'cap_' + Date.now(),
-          name, tag, status, splatUrl,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          added: Date.now(),
-        };
-
-        caps.unshift(cap);
-        saveCaps();
-        renderGrid();
-
-        // reset form
-        selectedFile = null;
-        fileInput.value = '';
-        document.getElementById('dropLabel').textContent = 'Glisse ton fichier ici';
-        document.getElementById('capName').value = '';
-        document.getElementById('capTag').value = '';
-        statusEl.textContent = '';
-        progressWrap.style.display = 'none';
-        progressBar.style.width = '0';
-        btn.disabled = true;
-
-        showToast(`"${name}" ajoutée à la collection ✓`);
-      }, 1800);
-    }
 
     // ── MODAL ──
     function openModal(index) {
@@ -1436,7 +1323,7 @@
       const viewer = document.getElementById('modalViewer');
       if (cap.splatUrl) {
         viewer.innerHTML = `<div id="modal-splat-container" style="width:100%;height:100%;position:relative;"></div>`;
-        setTimeout(() => initSplatViewer('modal-splat-container', cap.splatUrl), 100);
+        setTimeout(() => initSplatViewer('modal-splat-container', cap), 100);
       } else {
         viewer.innerHTML = `
       <div class="modal-placeholder">
