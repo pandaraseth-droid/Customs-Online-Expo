@@ -8,7 +8,7 @@ export const SPLAT_FILES = [
     number: '01',
     name: 'CUSTOM 01',
     tags: ['bleach dye', 'piercings laiton', 'distressed'],
-    status: 'available',
+    status: 'sold',
     band: '#100e0a',
     file: 'gaussiansplatcustom1.ply',
     duoWith: 'cap02',
