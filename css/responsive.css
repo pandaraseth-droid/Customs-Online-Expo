@@ -1,48 +1,233 @@
 /* ═══════════════════════════════════════
    Z CUSTOMS — Responsive
+   Breakpoints :
+     - <= 480 px : mobile S / iPhone SE
+     - <= 768 px : mobile L / portrait
+     - <= 1024 px : tablette portrait & paysage léger
+     - >= 1440 px : desktop large
+     - >= 1920 px : desktop XL / 4K
+     - landscape mobile (height <= 500px)
    ═══════════════════════════════════════ */
 
+#heroBelowFold,
+.hero-below,
+.coll-body,
+.coll-header,
+.detail-info,
+.hero-fold,
+.carousel-wrap {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  align-self: stretch;
+}
+
+/* TABLET (<= 1024 px) */
+@media (max-width: 1024px) {
+  .hero-card { width: clamp(280px, 38vw, 420px); }
+  .below-body { font-size: clamp(20px, 2.8vw, 30px); }
+  .coll-grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+    gap: 24px;
+  }
+  .detail-info { flex: 0 0 clamp(280px, 38%, 380px); padding: 24px; }
+  .d-name { font-size: 24px; }
+  .duo-layout { padding: 0 16px; }
+}
+
+/* MOBILE L (<= 768 px) */
 @media (max-width: 768px) {
   .nav-links { display: none; }
   .nav-hamburger { display: flex; }
+  .nav-inner { padding: 0 max(20px, var(--safe-right)) 0 max(20px, var(--safe-left)); }
 
-  .duo-layout { padding: 0 10px; flex-direction: column; gap: 0; }
-
+  .duo-layout {
+    padding: 0 14px;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    align-items: center;
+    width: 100%;
+  }
   .card-left {
-    transform: rotate(-2deg);
-    margin-right: 0; margin-bottom: -18px;
-    z-index: 2; position: relative;
+    transform: rotate(-2.5deg);
+    margin: 0 22px 38px 0;
+    z-index: 2;
+    position: relative;
   }
   .card-right {
-    transform: rotate(2deg);
-    margin-left: 0; margin-top: 0;
-    z-index: 1; position: relative;
+    transform: rotate(2.5deg);
+    margin: 0 0 0 22px;
+    z-index: 1;
+    position: relative;
   }
-  .card-left:hover  { transform: rotate(-2deg); }
-  .card-right:hover { transform: rotate(2deg); }
-
   .brush-x.center-x {
-    position: absolute; left: 50%; top: 50%;
-    transform: translate(-50%, -50%); z-index: 10;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    pointer-events: none;
   }
 
-  .hero-card { width: clamp(280px, 85vw, 340px); }
+  /* Dedicated keyframe for the centered X so the intro animation's final
+     `transform: scale(1) rotate(0)` doesn't overwrite the centering
+     translate.  Without this the X jumps off-center as soon as paintIn
+     finishes (visible "snap" right after page load). */
+  @keyframes paintInCentered {
+    0%   { transform: translate(-50%, -50%) scale(0)    rotate(-15deg); opacity: 0; }
+    60%  { transform: translate(-50%, -50%) scale(1.12) rotate(4deg);   opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1)    rotate(0deg);   opacity: 1; }
+  }
+  .brush-x.center-x.intro-anim {
+    animation: paintInCentered .6s cubic-bezier(.16,1,0.3,1) .3s forwards;
+  }
+
+  .hero-card { width: clamp(240px, 74vw, 320px); }
   .hero-card .cap-viewer { aspect-ratio: 4/3; }
 
   .detail-layout { flex-direction: column; }
   .detail-viewer-wrap {
     border-right: none;
     border-bottom: 1.5px solid var(--lgray);
-    flex: none; height: 52vw;
+    flex: none;
+    height: 50vh;
+    height: 50dvh;
+    min-height: 280px;
   }
-  .detail-info { width: 100%; padding: 16px; }
+  .detail-info {
+    flex: 1;
+    width: 100%;
+    padding: 20px max(24px, var(--safe-right)) 24px max(24px, var(--safe-left));
+    gap: 18px;
+  }
 
-  .coll-grid { grid-template-columns: 1fr; gap: 16px; }
-  .coll-body { padding: 16px 18px; }
-  .coll-header { padding: 14px 18px; }
-  .nav-inner { padding: 0 18px; }
+  .coll-grid { grid-template-columns: 1fr; gap: 18px; }
+  .coll-card:nth-child(odd),
+  .coll-card:nth-child(even) {
+    transform: rotate(0deg);
+    margin-top: 0;
+  }
+  .coll-body { padding: 18px max(24px, var(--safe-right)) 28px max(24px, var(--safe-left)); }
+  .coll-header { padding: 14px max(24px, var(--safe-right)) 12px max(24px, var(--safe-left)); }
+
   .ghost-text { font-size: clamp(60px, 24vw, 120px); }
-  .hero-below { padding: 32px 20px 28px; }
+
+  .hero-below {
+    padding: 32px max(28px, var(--safe-right)) 28px max(28px, var(--safe-left));
+    gap: 28px;
+  }
   .below-statement { gap: 12px; }
-  .below-strip { padding: 0 0 20px; }
+  .below-strip { padding: 0 0 16px; }
+  .below-body { font-size: clamp(19px, 5vw, 26px); }
+
+  .page-footer { gap: 8px; }
+  .footer-txt { font-size: 8.5px; }
+
+  .duo-badge { font-size: 11px; padding: 3px 14px; letter-spacing: 4px; }
+
+  .carousel-arrow { width: 38px; height: 38px; font-size: 17px; }
+
+  .coll-card { box-shadow: 3px 3px 0 var(--shadow); }
+}
+
+/* MOBILE S (<= 480 px) */
+@media (max-width: 480px) {
+  .nav-brand { font-size: 20px; letter-spacing: 4px; }
+  .coll-title { font-size: 18px; letter-spacing: 4px; }
+  .coll-count { font-size: 9.5px; }
+  .hero-card { width: clamp(220px, 76vw, 300px); }
+  .below-eyebrow { letter-spacing: 4px; font-size: 10px; }
+  .below-body { font-size: clamp(17px, 5.2vw, 22px); line-height: 1.25; }
+  .below-cta { font-size: 14px; padding: 9px 18px; letter-spacing: 3px; }
+  .strip-card { width: 140px; }
+  .below-strip-label { font-size: 12px; letter-spacing: 3px; }
+
+  .stamp { font-size: 12px; padding: 1px 6px; }
+  .card-name { font-size: 15px; letter-spacing: 2.5px; }
+  .card-tags { font-size: 9.5px; }
+
+  .ghost-text { font-size: clamp(56px, 22vw, 100px); opacity: .12; }
+
+  .d-plate { width: 44px; height: 34px; font-size: 24px; }
+  .d-name  { font-size: 22px; letter-spacing: 2.5px; }
+  .detail-info { padding: 16px max(22px, var(--safe-right)) 20px max(22px, var(--safe-left)); }
+  .detail-counter { font-size: 9px; }
+  .back-btn { font-size: 11px; }
+
+  .hero-below { padding: 28px max(22px, var(--safe-right)) 24px max(22px, var(--safe-left)); }
+  .coll-body { padding: 16px max(20px, var(--safe-right)) 24px max(20px, var(--safe-left)); }
+  .coll-header { padding: 12px max(20px, var(--safe-right)) 10px max(20px, var(--safe-left)); }
+
+  .card-left  { margin: 0 26px 32px 0; }
+  .card-right { margin: 0 0 0 26px; }
+}
+
+/* MOBILE LANDSCAPE (height <= 500 px) */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero-card { width: clamp(220px, 28vw, 320px); }
+  .hero-card .cap-viewer { aspect-ratio: 4/3; }
+  .duo-layout {
+    flex-direction: row;
+    padding: 0 14px;
+    gap: 0;
+  }
+  .card-left  { transform: rotate(-3deg); margin: 0 -10px 0 0; }
+  .card-right { transform: rotate(3deg);  margin: 0 0 0 -10px; }
+  .brush-x.center-x { position: relative; left: auto; top: auto; transform: none; }
+
+  /* Landscape : revert to the standard paintIn (no translate centering) */
+  .brush-x.center-x.intro-anim {
+    animation: paintIn .6s cubic-bezier(.16,1,0.3,1) .3s forwards;
+  }
+
+  .ghost-text { font-size: clamp(70px, 14vw, 140px); top: 6px; }
+  .duo-badge  { top: calc(8px + var(--safe-top)); font-size: 11px; padding: 3px 14px; }
+
+  .dot-nav { padding: 6px 0 8px; }
+  .hero-below { padding: 24px 32px; gap: 20px; }
+
+  .detail-layout { flex-direction: row; }
+  .detail-viewer-wrap {
+    border-right: 1.5px solid var(--lgray);
+    border-bottom: none;
+    flex: 1;
+    height: auto;
+    min-height: 0;
+  }
+  .detail-info { flex: 0 0 clamp(240px, 38%, 360px); padding: 16px; }
+}
+
+/* DESKTOP LARGE (>= 1440 px) */
+@media (min-width: 1440px) {
+  .hero-card { width: clamp(420px, 32vw, 560px); }
+  .nav-inner { padding: 0 max(40px, var(--safe-right)) 0 max(40px, var(--safe-left)); }
+  .coll-header { padding: 20px 48px 14px; }
+  .coll-body { padding: 32px 48px 48px; }
+  .coll-grid { gap: 40px; grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)); }
+  .detail-info { flex: 0 0 clamp(360px, 28%, 480px); padding: 40px; }
+  .below-body { font-size: clamp(28px, 2.4vw, 42px); }
+  .hero-below { padding: 56px 64px 48px; gap: 44px; }
+  .ghost-text { font-size: clamp(220px, 22vw, 380px); }
+}
+
+/* DESKTOP XL (>= 1920 px) */
+@media (min-width: 1920px) {
+  .hero-card { width: clamp(480px, 28vw, 640px); }
+  .coll-grid { grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr)); gap: 48px; }
+  .detail-info { flex: 0 0 clamp(420px, 26%, 560px); padding: 48px; }
+}
+
+/* COARSE POINTER (touch) */
+@media (hover: none) and (pointer: coarse) {
+  .cap-card { transition: box-shadow .2s; }
+  .strip-card:nth-child(odd)  { transform: rotate(-1deg); }
+  .strip-card:nth-child(even) { transform: rotate(1deg); }
+}
+
+/* PRINT */
+@media print {
+  nav, .page-footer, .duo-badge, .ghost-text, .stripe-layer, .dot-grid, .mobile-menu, .carousel-arrow { display: none !important; }
+  body, #app { background: #fff; height: auto; overflow: visible; }
+  .page { position: static; transform: none; opacity: 1; visibility: visible; }
 }

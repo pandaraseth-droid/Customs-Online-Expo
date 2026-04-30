@@ -2,33 +2,37 @@
    Z CUSTOMS — App Entry Point
    ═══════════════════════════════════════ */
 
-import { renderHero, carouselGo, carouselStep } from './carousel.js';
+import { renderHero, carouselGo, carouselStep, attachCarouselSwipe } from './carousel.js';
 import { goTo, toggleMenu, renderCollection, openDetail, closeDetail } from './pages.js';
 
-/* ─── Click vs Drag guard ───
-   When user drags to rotate the 3D model, the click event still fires
-   on the parent .cap-card. We track pointer movement distance and
-   block the openDetail call if the user dragged more than a few pixels.
-*/
-let _downX = 0, _downY = 0, _downTime = 0;
-const CLICK_THRESHOLD = 6;
+/* Dynamic viewport height fix for old iOS / Android */
+function setVH() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+setVH();
+window.addEventListener('resize', setVH, { passive: true });
+window.addEventListener('orientationchange', () => setTimeout(setVH, 150));
+
+/* Click vs Drag guard */
+let _downX = 0, _downY = 0, _downType = 'mouse';
 
 document.addEventListener('pointerdown', e => {
   _downX = e.clientX;
   _downY = e.clientY;
-  _downTime = Date.now();
+  _downType = e.pointerType || 'mouse';
 }, true);
 
 function safeOpenDetail(pieceId, event) {
   if (event) {
     const dx = Math.abs(event.clientX - _downX);
     const dy = Math.abs(event.clientY - _downY);
-    if (dx > CLICK_THRESHOLD || dy > CLICK_THRESHOLD) return;
+    const threshold = (_downType === 'touch' || _downType === 'pen') ? 14 : 6;
+    if (dx > threshold || dy > threshold) return;
   }
   openDetail(pieceId);
 }
 
-// Expose to global scope for onclick handlers in HTML
 window.goTo = goTo;
 window.toggleMenu = toggleMenu;
 window.openDetail = safeOpenDetail;
@@ -36,23 +40,28 @@ window.closeDetail = closeDetail;
 window.carouselGo = carouselGo;
 window.carouselStep = carouselStep;
 
-/* ─── Debounced resize ─── */
+/* Debounced resize */
 let _resizeTimer = null;
+let _lastWidth = window.innerWidth;
 
 function onResize() {
   clearTimeout(_resizeTimer);
   _resizeTimer = setTimeout(() => {
-    renderHero();
+    const w = window.innerWidth;
+    const crossedMobileBreakpoint =
+      (w < 768 && _lastWidth >= 768) || (w >= 768 && _lastWidth < 768);
+    if (crossedMobileBreakpoint) renderHero();
+    _lastWidth = w;
   }, 250);
 }
 
-/* ─── Boot ─── */
 document.addEventListener('DOMContentLoaded', () => {
   renderHero();
   renderCollection();
+  attachCarouselSwipe();
 
   const savedPage = localStorage.getItem('zc_page') || 'hero';
   goTo(savedPage);
 });
 
-window.addEventListener('resize', onResize);
+window.addEventListener('resize', onResize, { passive: true });

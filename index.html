@@ -2,77 +2,84 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"/>
+  <meta name="format-detection" content="telephone=no"/>
+
   <title>Z Customs — Online Expo</title>
   <meta name="description" content="Z Customs — Expo en ligne de casquettes custom uniques. Bleach dye, piercings métalliques, distressed. Chaque pièce est une œuvre."/>
+
+  <meta name="theme-color" content="#100e0a"/>
+  <meta name="color-scheme" content="light"/>
+
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="Z Customs"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+
   <meta property="og:title" content="Z Customs — Online Expo"/>
   <meta property="og:description" content="Casquettes custom uniques — techniques de destruction appliquées au streetwear."/>
   <meta property="og:type" content="website"/>
+  <meta name="twitter:card" content="summary_large_image"/>
 
-  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;900&family=Space+Mono&family=Caveat:wght@600&display=swap" rel="stylesheet"/>
 
-  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/tokens.css"/>
   <link rel="stylesheet" href="css/layout.css"/>
   <link rel="stylesheet" href="css/components.css"/>
   <link rel="stylesheet" href="css/responsive.css"/>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23100e0a'/%3E%3Cline x1='14' y1='14' x2='50' y2='50' stroke='%23cc1111' stroke-width='10' stroke-linecap='round'/%3E%3Cline x1='50' y1='14' x2='14' y2='50' stroke='%23cc1111' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E"/>
 </head>
 <body>
 <div id="app">
 
-  <!-- ── NAV ── -->
   <nav>
     <div class="nav-inner">
-      <div class="nav-brand" onclick="goTo('hero')">Z CUSTOMS</div>
-      <div class="nav-links">
-        <button class="nav-link active" data-page="hero" onclick="goTo('hero')">EXPO</button>
+      <div class="nav-brand" onclick="goTo('hero')" role="button" tabindex="0">Z CUSTOMS</div>
+      <div class="nav-links" role="tablist">
+        <button class="nav-link active" data-page="hero" onclick="goTo('hero')" aria-current="page">EXPO</button>
         <button class="nav-link" data-page="collection" onclick="goTo('collection')">COLLECTION</button>
       </div>
-      <button class="nav-hamburger" onclick="toggleMenu()" aria-label="menu">
+      <button class="nav-hamburger" onclick="toggleMenu()" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu">
         <span></span><span></span><span></span>
       </button>
     </div>
   </nav>
 
-  <!-- Mobile menu -->
-  <div class="mobile-menu" id="mobileMenu">
-    <button class="mm-link active" data-page="hero" onclick="goTo('hero');toggleMenu()">EXPO</button>
+  <div class="mobile-menu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menu de navigation">
+    <button class="mm-link active" data-page="hero" onclick="goTo('hero');toggleMenu()" aria-current="page">EXPO</button>
     <button class="mm-link" data-page="collection" onclick="goTo('collection');toggleMenu()">COLLECTION</button>
   </div>
 
-  <!-- Global Overlays -->
-  <div class="stripe-layer hero-only" id="heroStripes"></div>
-  <div class="ghost-text hero-only">Z CUSTOMS</div>
-  <div class="duo-badge hero-only" id="heroBadge">DUO NO. 01</div>
+  <div class="stripe-layer hero-only" id="heroStripes" aria-hidden="true"></div>
+  <div class="ghost-text hero-only" aria-hidden="true">Z CUSTOMS</div>
+  <div class="duo-badge hero-only" id="heroBadge" aria-hidden="true">DUO NO. 01</div>
 
   <div class="pages">
 
-    <!-- ════ HERO ════ -->
     <section id="page-hero" class="page active" data-screen-label="01 Expo">
-      <!-- Above fold -->
       <div class="hero-fold">
-        <div class="dot-grid"></div>
+        <div class="dot-grid" aria-hidden="true"></div>
 
         <div class="carousel-wrap">
-          <div class="carousel-track" id="carouselTrack"></div>
-          <button class="carousel-arrow arrow-left" id="arrowL" style="display:none" onclick="carouselStep(-1)">←</button>
-          <button class="carousel-arrow arrow-right" id="arrowR" style="display:none" onclick="carouselStep(1)">→</button>
+          <div class="carousel-track" id="carouselTrack" role="region" aria-label="Carrousel des pièces"></div>
+          <button class="carousel-arrow arrow-left" id="arrowL" style="display:none" onclick="carouselStep(-1)" aria-label="Pièce précédente">←</button>
+          <button class="carousel-arrow arrow-right" id="arrowR" style="display:none" onclick="carouselStep(1)" aria-label="Pièce suivante">→</button>
         </div>
 
-        <div class="dot-nav" id="dotNav">
+        <div class="dot-nav" id="dotNav" role="tablist" aria-label="Navigation carrousel">
           <span class="dot-label" style="font-family:var(--mono);font-size:9px;color:var(--gray)">↓ scroll</span>
         </div>
       </div>
 
-      <!-- Below fold — injected by JS -->
       <div id="heroBelowFold"></div>
     </section>
 
-    <!-- ════ COLLECTION ════ -->
     <section id="page-collection" class="page slide-right" data-screen-label="02 Collection">
-      <div class="dot-grid"></div>
-      <div class="stripe-layer" id="collStripes"></div>
+      <div class="dot-grid" aria-hidden="true"></div>
+      <div class="stripe-layer" id="collStripes" aria-hidden="true"></div>
 
       <div class="coll-header">
         <div class="coll-title">COLLECTION</div>
@@ -88,11 +95,10 @@
       </div>
     </section>
 
-    <!-- ════ DETAIL ════ -->
     <section id="page-detail" class="page slide-right" data-screen-label="03 Pièce">
-      <div class="dot-grid"></div>
+      <div class="dot-grid" aria-hidden="true"></div>
       <div class="detail-topbar">
-        <button class="back-btn" onclick="closeDetail()">← RETOUR</button>
+        <button class="back-btn" onclick="closeDetail()" aria-label="Retour">← RETOUR</button>
         <div class="detail-counter" id="detailCounter"></div>
       </div>
       <div class="detail-layout">
@@ -107,17 +113,15 @@
       </div>
     </section>
 
-  </div><!-- .pages -->
-</div><!-- #app -->
+  </div>
+</div>
 
-<!-- SharedArrayBuffer fix for GitHub Pages -->
 <script>
   if (!window.crossOriginIsolated) {
     window.SharedArrayBuffer = undefined;
   }
 </script>
 
-<!-- 3D Engine -->
 <script type="importmap">
 {
   "imports": {
@@ -130,7 +134,6 @@
   window.GaussianSplats3D = GaussianSplats3D;
 </script>
 
-<!-- Application -->
 <script type="module" src="js/app.js"></script>
 </body>
 </html>

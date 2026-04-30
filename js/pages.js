@@ -9,7 +9,6 @@ import { initSplatViewer } from './viewer.js';
 const PAGE_ORDER = ['hero', 'collection', 'detail'];
 let prevPageId = 'hero';
 
-/* ─── Navigation ─── */
 export function goTo(name) {
   const ti = PAGE_ORDER.indexOf(name);
   document.querySelectorAll('.page').forEach(p => {
@@ -18,9 +17,12 @@ export function goTo(name) {
     p.classList.remove('active', 'slide-left', 'slide-right');
     p.classList.add(id === name ? 'active' : ii < ti ? 'slide-left' : 'slide-right');
   });
-  document.querySelectorAll('[data-page]').forEach(el =>
-    el.classList.toggle('active', el.dataset.page === name)
-  );
+  document.querySelectorAll('[data-page]').forEach(el => {
+    const active = el.dataset.page === name;
+    el.classList.toggle('active', active);
+    if (active) el.setAttribute('aria-current', 'page');
+    else el.removeAttribute('aria-current');
+  });
   document.getElementById('app').dataset.activePage = name;
   localStorage.setItem('zc_page', name);
 
@@ -28,21 +30,35 @@ export function goTo(name) {
 }
 
 export function toggleMenu() {
-  document.getElementById('mobileMenu').classList.toggle('open');
+  const menu = document.getElementById('mobileMenu');
+  const burger = document.querySelector('.nav-hamburger');
+  if (!menu) return;
+
+  const isOpen = menu.classList.toggle('open');
+  if (burger) burger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+  if (isOpen) {
+    document.body.classList.add('menu-open');
+  } else {
+    document.body.classList.remove('menu-open');
+  }
 }
 
-/* ─── Collection ─── */
 export function renderCollection() {
-  document.getElementById('collCount').textContent =
-    `${PIECES.length} pièce${PIECES.length > 1 ? 's' : ''} · toutes uniques`;
+  const countEl = document.getElementById('collCount');
+  if (countEl) {
+    countEl.textContent = `${PIECES.length} pièce${PIECES.length > 1 ? 's' : ''} · toutes uniques`;
+  }
 
   stripes('collStripes', [
     { top: 6, h: 20, col: '#100e0a', op: .08 },
     { top: 28, h: 3, col: '#100e0a', op: .06 },
   ]);
 
-  document.getElementById('collGrid').innerHTML = PIECES.map(p => `
-    <div class="coll-card" onclick="openDetail('${p.id}', event)">
+  const grid = document.getElementById('collGrid');
+  if (!grid) return;
+  grid.innerHTML = PIECES.map(p => `
+    <div class="coll-card" onclick="openDetail('${p.id}', event)" role="button" tabindex="0" aria-label="${p.name}">
       ${p.duoWith ? `<div class="coll-duo-tag">DUO ×</div>` : ''}
       <div class="card-band" style="background:${p.band}"></div>
       <div class="cap-viewer" id="cv-${p.id}">${placeholder(300, 220)}</div>
@@ -56,17 +72,33 @@ export function renderCollection() {
       </div>
     </div>`
   ).join('') +
-  `<div class="coll-card coll-empty"><div class="coll-empty-label"><div class="e1">COMING SOON</div><div class="e2">+ nouvelle pièce</div></div></div>`;
+  `<div class="coll-card coll-empty" aria-hidden="true"><div class="coll-empty-label"><div class="e1">COMING SOON</div><div class="e2">+ nouvelle pièce</div></div></div>`;
 }
 
 function initCollViewers() {
+  if (!('IntersectionObserver' in window)) {
+    PIECES.forEach(p => {
+      const el = document.getElementById(`cv-${p.id}`);
+      if (el) initSplatViewer(el, p, `coll-${p.id}`);
+    });
+    return;
+  }
+  const io = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id.replace('cv-', '');
+      const piece = PIECES.find(p => p.id === id);
+      if (piece) initSplatViewer(entry.target, piece, `coll-${id}`);
+      observer.unobserve(entry.target);
+    });
+  }, { rootMargin: '200px 0px' });
+
   PIECES.forEach(p => {
     const el = document.getElementById(`cv-${p.id}`);
-    if (el) initSplatViewer(el, p, `coll-${p.id}`);
+    if (el) io.observe(el);
   });
 }
 
-/* ─── Detail ─── */
 export function openDetail(pieceId) {
   prevPageId = document.querySelector('.page.active')?.id?.replace('page-', '') || 'hero';
   const piece = PIECES.find(p => p.id === pieceId);
@@ -74,7 +106,7 @@ export function openDetail(pieceId) {
 
   const idx = PIECES.findIndex(p => p.id === pieceId);
   document.getElementById('detailCounter').textContent = `${idx + 1} / ${PIECES.length}`;
-  document.getElementById('detailFooterTag').textContent = piece.tags[0];
+  document.getElementById('detailFooterTag').textContent = piece.tags[0] || '';
 
   const statusOk = piece.status === 'available';
   document.getElementById('detailInfo').innerHTML = `
@@ -82,7 +114,7 @@ export function openDetail(pieceId) {
       <div class="d-plate ${piece.band === '#100e0a' ? 'plate-ink' : 'plate-red'}">${piece.number}</div>
       <div class="d-name">${piece.name}</div>
     </div>
-    <div class="d-divider"></div>
+    <div class="d-divider" aria-hidden="true"></div>
     <div>
       <div class="d-section">TECHNIQUES</div>
       <div class="d-tags">${piece.tags.map(t => `<div class="d-tag">${t}</div>`).join('')}</div>
@@ -96,7 +128,7 @@ export function openDetail(pieceId) {
     </div>`;
 
   const vc = document.getElementById('detailViewerEl');
-  initSplatViewer(vc, piece, 'detail');
+  if (vc) initSplatViewer(vc, piece, 'detail');
   goTo('detail');
 }
 
