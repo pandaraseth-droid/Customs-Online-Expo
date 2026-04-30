@@ -1,0 +1,99 @@
+/* ═══════════════════════════════════════
+   Z CUSTOMS — Layout (Shell, Nav, Pages)
+   ═══════════════════════════════════════ */
+
+/* ─── App shell ─── */
+#app {
+  width: 100vw; height: 100vh;
+  background: var(--bg);
+  position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* ─── NAV ─── */
+nav {
+  flex-shrink: 0; position: relative; z-index: 50;
+  background: var(--ink); border-top: 4px solid var(--red);
+}
+.nav-inner {
+  height: 46px; display: flex; align-items: center;
+  justify-content: space-between; padding: 0 28px;
+}
+.nav-brand {
+  font-family: var(--bebas); font-size: 24px; letter-spacing: 6px;
+  color: #fff; cursor: pointer; user-select: none;
+}
+
+.nav-links { display: flex; height: 100%; }
+.nav-link {
+  display: flex; align-items: center; padding: 0 18px;
+  font-family: var(--barlow); font-size: 12px; font-weight: 700;
+  letter-spacing: 3px; color: #555; cursor: pointer;
+  border: none; background: none; transition: color .2s, background .2s;
+  text-transform: uppercase;
+}
+.nav-link.active, .nav-link:hover { background: var(--red); color: #fff; }
+.nav-hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  cursor: pointer; border: none; background: none; padding: 4px;
+}
+.nav-hamburger span { display: block; height: 2.5px; background: #fff; width: 22px; }
+.nav-hamburger span:nth-child(2) { width: 16px; background: var(--red); }
+
+/* ─── Pages container ─── */
+
+.pages { position: relative; flex: 1; overflow: hidden; z-index: 10; background: transparent; }
+
+/* ─── Page transitions ─── (FIX: visibility:hidden on inactive pages) */
+.page {
+  position: absolute; inset: 0;
+  transition: transform .55s cubic-bezier(.4,0,.2,1), opacity .45s ease, visibility 0s linear .55s;
+  will-change: transform, opacity;
+}
+.page.active {
+  transform: translateX(0); opacity: 1; visibility: visible; pointer-events: auto;
+  transition: transform .55s cubic-bezier(.4,0,.2,1), opacity .45s ease, visibility 0s linear 0s;
+}
+.page.slide-left  { transform: translateX(-100%); opacity: 0; visibility: hidden; pointer-events: none; }
+.page.slide-right { transform: translateX(100%);  opacity: 0; visibility: hidden; pointer-events: none; }
+
+/* ─── Shared backgrounds ─── */
+.dot-grid {
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(16,14,10,.07) 1px, transparent 1px);
+  background-size: 18px 18px;
+  z-index: -1;
+}
+.ghost-text {
+  position: absolute; top: 20px; left: -20px;
+  font-family: var(--bebas); font-size: clamp(120px,22vw,350px);
+  color: var(--ink); opacity: .15; letter-spacing: -4px;
+  pointer-events: none; user-select: none; white-space: nowrap; line-height: .8;
+  z-index: 1;
+}
+.stripe-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+.stripe {
+  position: absolute; left: -10%; right: -10%;
+  transform: skewY(-4deg); transform-origin: center;
+}
+
+/* ─── Footer ─── */
+.page-footer {
+  flex-shrink: 0; background: var(--ink); padding: 10px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-txt { font-family: var(--mono); font-size: 9px; color: #555; }
+
+/* ─── Mobile menu ─── */
+.mobile-menu {
+  position: fixed; top: 50px; left: 0; right: 0; bottom: 0;
+  background: var(--ink); z-index: 49;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;
+  transform: translateY(-100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.mobile-menu.open { transform: translateY(0); }
+.mm-link {
+  font-family: var(--bebas); font-size: 36px; letter-spacing: 6px;
+  color: #fff; cursor: pointer; border: none; background: none; transition: color .2s;
+}
+.mm-link.active, .mm-link:hover { color: var(--red); }

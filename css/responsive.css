@@ -1,0 +1,48 @@
+/* ═══════════════════════════════════════
+   Z CUSTOMS — Responsive
+   ═══════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+
+  .duo-layout { padding: 0 10px; flex-direction: column; gap: 0; }
+
+  .card-left {
+    transform: rotate(-2deg);
+    margin-right: 0; margin-bottom: -18px;
+    z-index: 2; position: relative;
+  }
+  .card-right {
+    transform: rotate(2deg);
+    margin-left: 0; margin-top: 0;
+    z-index: 1; position: relative;
+  }
+  .card-left:hover  { transform: rotate(-2deg); }
+  .card-right:hover { transform: rotate(2deg); }
+
+  .brush-x.center-x {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%); z-index: 10;
+  }
+
+  .hero-card { width: clamp(280px, 85vw, 340px); }
+  .hero-card .cap-viewer { aspect-ratio: 4/3; }
+
+  .detail-layout { flex-direction: column; }
+  .detail-viewer-wrap {
+    border-right: none;
+    border-bottom: 1.5px solid var(--lgray);
+    flex: none; height: 52vw;
+  }
+  .detail-info { width: 100%; padding: 16px; }
+
+  .coll-grid { grid-template-columns: 1fr; gap: 16px; }
+  .coll-body { padding: 16px 18px; }
+  .coll-header { padding: 14px 18px; }
+  .nav-inner { padding: 0 18px; }
+  .ghost-text { font-size: clamp(60px, 24vw, 120px); }
+  .hero-below { padding: 32px 20px 28px; }
+  .below-statement { gap: 12px; }
+  .below-strip { padding: 0 0 20px; }
+}
