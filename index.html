@@ -615,12 +615,25 @@ function loadCaps() {
   } catch { return getDefaultCaps(); }
 }
 
+// ── SPLATS CONFIG ──
+// Pour ajouter une casquette : duplique une ligne, incrémente le numéro
+// et mets le fichier correspondant dans /splats/
+const SPLAT_FILES = [
+  { file: 'gaussiansplatcustom1.spz', name: 'Custom 01', tag: 'gaussian splat', status: 'unique', color: '#c9a84c' },
+  { file: 'gaussiansplatcustom2.spz', name: 'Custom 02', tag: 'gaussian splat', status: 'unique', color: '#1a3a5c' },
+  // { file: 'gaussiansplatcustom3.spz', name: 'Custom 03', tag: 'gaussian splat', status: 'unique', color: '#8b1a1a' },
+];
+
 function getDefaultCaps() {
-  return [
-    { id: 'demo1', name: 'Soleil Levant', tag: 'broderie · fil or', status: 'unique', splatUrl: null, color: '#c9a84c', added: Date.now() },
-    { id: 'demo2', name: 'Minuit Bleu',   tag: 'patch custom',      status: 'soon',   splatUrl: null, color: '#1a3a5c', added: Date.now() },
-    { id: 'demo3', name: 'Rouge Berlin',  tag: 'tie-dye · broderie', status: 'unique', splatUrl: null, color: '#8b1a1a', added: Date.now() },
-  ];
+  return SPLAT_FILES.map((s, i) => ({
+    id: 'splat_' + (i + 1),
+    name: s.name,
+    tag: s.tag,
+    status: s.status,
+    splatUrl: '/splats/' + s.file,
+    color: s.color,
+    added: Date.now(),
+  }));
 }
 
 function saveCaps() {
