@@ -14,6 +14,9 @@ const _activeViewers = {};
    splat scene has finished loading. */
 const _viewerGen = {};
 
+/* Auto-rotation RAF handles — cancelled on dispose or user interaction. */
+const _autoRotateRAFs = {};
+
 const MAX_DPR = 1.5;
 
 function eulerToQuaternion(degX, degY, degZ) {
@@ -44,6 +47,10 @@ function safeDispose(viewer) {
 }
 
 export function disposeViewer(key) {
+  if (_autoRotateRAFs[key]) {
+    cancelAnimationFrame(_autoRotateRAFs[key]);
+    delete _autoRotateRAFs[key];
+  }
   if (_activeViewers[key]) {
     const v = _activeViewers[key];
     delete _activeViewers[key];
@@ -135,6 +142,83 @@ export function initSplatViewer(container, cap, key) {
 
     const cvs = container.querySelector('canvas');
     if (cvs) cvs.style.touchAction = 'none';
+
+    /* ── Auto-rotation ────────────────────────────────────────────────────
+       Slow spin until the user first interacts, then stops.
+       Restarts automatically after 4 s of inactivity.                     */
+    const cam = viewer.camera || viewer.perspectiveCamera;
+    if (cam && _viewerGen[key] === gen) {
+      const ROT_SPEED   = 0.004;  // radians per frame (~14°/s at 60 fps)
+      const RESUME_DELAY = 4000;  // ms before restarting after interaction
+      let autoRotating = true;
+      let resumeTimer  = null;
+
+      const stopRotation = () => {
+        if (!autoRotating) return;
+        autoRotating = false;
+        if (_autoRotateRAFs[key]) {
+          cancelAnimationFrame(_autoRotateRAFs[key]);
+          delete _autoRotateRAFs[key];
+        }
+      };
+
+      const startRotation = () => {
+        if (autoRotating || _activeViewers[key] !== viewer) return;
+        autoRotating = true;
+        tick();
+      };
+
+      const tick = () => {
+        if (!autoRotating || _activeViewers[key] !== viewer) {
+          delete _autoRotateRAFs[key];
+          return;
+        }
+        /* Rotate camera position around pivot in the XZ plane */
+        const dx = cam.position.x - pivot[0];
+        const dz = cam.position.z - pivot[2];
+        const cos = Math.cos(ROT_SPEED);
+        const sin = Math.sin(ROT_SPEED);
+        cam.position.x = pivot[0] + dx * cos - dz * sin;
+        cam.position.z = pivot[2] + dx * sin + dz * cos;
+        cam.lookAt(pivot[0], pivot[1], pivot[2]);
+        _autoRotateRAFs[key] = requestAnimationFrame(tick);
+      };
+
+      /* Start spinning straight away */
+      tick();
+
+      /* ── Drag hint ──────────────────────────────────────────────────────── */
+      const hint = document.createElement('div');
+      hint.className = 'viewer-drag-hint';
+      hint.setAttribute('aria-hidden', 'true');
+      hint.innerHTML =
+        `<svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+           <path d="M6.5 1.5 A5 5 0 1 1 1.5 6.5" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>
+           <polyline points="6.5,0 6.5,3 4,1.5" fill="#fff"/>
+         </svg>drag`;
+      container.appendChild(hint);
+
+      let hintGone = false;
+      const fadeHint = () => {
+        if (hintGone) return;
+        hintGone = true;
+        hint.classList.add('viewer-drag-hint--out');
+        setTimeout(() => { if (hint.parentNode) hint.remove(); }, 520);
+      };
+      /* Auto-dismiss after 3 s */
+      setTimeout(fadeHint, 3000);
+
+      /* Stop on first touch/click; restart after inactivity */
+      const onInteractionStart = () => {
+        fadeHint();
+        stopRotation();
+        clearTimeout(resumeTimer);
+        resumeTimer = setTimeout(startRotation, RESUME_DELAY);
+      };
+
+      container.addEventListener('pointerdown', onInteractionStart);
+      container.addEventListener('touchstart',  onInteractionStart, { passive: true });
+    }
   }).catch(err => {
     /* Network errors, parse errors, or stale-load aborts. Don't bubble. */
     console.warn('[Viewer] scene load aborted:', err && err.message ? err.message : err);

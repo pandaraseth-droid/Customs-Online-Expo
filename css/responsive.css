@@ -198,6 +198,33 @@
   .detail-info { flex: 0 0 clamp(240px, 38%, 360px); padding: 16px; }
 }
 
+/* DESKTOP baseline (>= 1025 px) — sections non pleine largeur */
+@media (min-width: 1025px) {
+  /* Le fold ne prend plus 100 % de l'écran : on supprime l'espace mort */
+  .hero-fold {
+    height: clamp(440px, 68vh, 680px);
+    min-height: 0;
+  }
+
+  /* Hero below: centré via margin auto (son parent direct #heroBelowFold
+     n'est pas flex, donc align-self ne fait rien). */
+  #page-hero .hero-below {
+    width: min(1080px, 100%);
+    max-width: 1080px;
+    margin-left: auto;
+    margin-right: auto;
+    border-left: 2.5px solid var(--ink);
+    border-right: 2.5px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--shadow);
+    padding: 32px 48px 28px;
+  }
+
+  /* Le strip de thumbnails — ~3 cartes visibles, scrollable au-delà */
+  .below-strip {
+    max-width: 544px;
+  }
+}
+
 /* DESKTOP LARGE (>= 1440 px) */
 @media (min-width: 1440px) {
   .hero-card { width: clamp(420px, 32vw, 560px); }
@@ -207,7 +234,8 @@
   .coll-grid { gap: 40px; grid-template-columns: repeat(auto-fill, minmax(min(360px, 100%), 1fr)); }
   .detail-info { flex: 0 0 clamp(360px, 28%, 480px); padding: 40px; }
   .below-body { font-size: clamp(28px, 2.4vw, 42px); }
-  .hero-below { padding: 56px 64px 48px; gap: 44px; }
+  #page-hero .hero-below { max-width: 1200px; width: min(1200px, 100%); margin-left: auto; margin-right: auto; padding: 40px 72px 36px; gap: 40px; }
+  .hero-fold  { height: clamp(500px, 70vh, 760px); }
   .ghost-text { font-size: clamp(220px, 22vw, 380px); }
 }
 

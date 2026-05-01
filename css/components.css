@@ -49,6 +49,36 @@
   pointer-events: none;
 }
 .cap-placeholder-svg { animation: capSpin 6s ease-in-out infinite; }
+
+/* ── Drag hint overlay ── */
+.viewer-drag-hint {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(16, 14, 10, 0.68);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 5px 13px 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  pointer-events: none;
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+.viewer-drag-hint svg { flex-shrink: 0; animation: hintSpin 2s linear infinite; }
+@keyframes hintSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.viewer-drag-hint--out { opacity: 0; }
 @keyframes capSpin {
   0%,100% { transform: perspective(300px) rotateY(0deg); }
   30%     { transform: perspective(300px) rotateY(30deg); }
